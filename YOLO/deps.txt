@@ -1,0 +1,10 @@
+#pip install 
+tensorflow
+tensorboard
+scikit-learn
+pandas
+pydicom
+keras
+scikit-image
+PIL
+
