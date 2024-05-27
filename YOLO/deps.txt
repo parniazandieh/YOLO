@@ -7,4 +7,4 @@ pydicom
 keras
 scikit-image
 Pillow
-
+tqdm
