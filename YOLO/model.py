@@ -13,16 +13,15 @@ import time
 
 # Imports for dataset manipulation
 from sklearn.model_selection import train_test_split
-from keras.preprocessing.image import ImageDataGenerator
+from keras.src.legacy.preprocessing.image import ImageDataGenerator
 
 # Improve progress bar display
 import tqdm
 import tqdm.auto
 tqdm.tqdm = tqdm.auto.tqdm
 
-#tf.enable_eager_execution() #comment this out if causing errors
+# tf.enable_eager_execution() #comment this out if causing errors
 tf.logging.set_verbosity(tf.logging.DEBUG)
-
 
 
 ###             SET MODEL CONFIGURATIONS             ###
@@ -47,12 +46,11 @@ num_epochs = 1
 shape_path = 'trained_model/model_shape.json'
 weight_path = 'trained_model/model_weights.h5'
 
-# TensorBoard 
+# TensorBoard
 tb_graph = False
 tb_update_freq = 'batch'
 
 
-            
 ###         GET THE DATASET AND PREPROCESS IT        ###
 
 print("Loading and processing data\n") 
@@ -63,7 +61,7 @@ data_frame = pd.read_csv(CSV_PATH)
 Construct numpy ndarrays from the loaded csv to use as training
 and testing datasets.
 """ 
-# zip all points for each image label together into a tuple 
+# zip all points for each image label together into a tuple
 points = zip(data_frame['start_x'], data_frame['start_y'], \
                        data_frame['end_x'], data_frame['end_y'])
 img_paths = data_frame['imgPath']
@@ -152,7 +150,6 @@ generator = ImageDataGenerator(rotation_range=0, zoom_range=0,
 print("Data preprocessing complete\n")
 
 
-
 ###            DEFINITION OF MODEL SHAPE             ###
 """
 Model definition according (approximately) to the YOLO model 
@@ -239,7 +236,7 @@ def log_loss(y_true, y_pred):
     # boxes that have worse IOU (up to value of log(epsilon))
     loss = tf.negative(tf.log(iou))
     return loss
-    
+
 
 # custom loss function using aspects of relevant information from the YOLO paper
 def YOLO_loss(y_true, y_pred):
@@ -377,20 +374,19 @@ def IOU_metric(y_true, y_pred):
     return iou
 
 
-
 # small step size works best
 model.compile(optimizer=tf.keras.optimizers.Adam(lr=step_size),
               loss=YOLO_loss,
               metrics=['accuracy', IOU_metric, 'mse', log_loss])
 
-#print(model.summary()) #see the shape of the model
+# print(model.summary()) #see the shape of the model
 
 
 ###                   TRAIN THE MODEL                ###
 callbacks = []
 
 # use tensorboard to visualize training on localhost:6006. Call from terminal with:
-#>tensorboard --logdir=/path/to/logs
+# >tensorboard --logdir=/path/to/logs
 callbacks.append(tf.keras.callbacks.TensorBoard(log_dir='logs/{}'.format(time.time()),
                                                  write_graph=tb_graph,
                                                  batch_size=BATCH_SIZE,
@@ -405,13 +401,11 @@ model.fit_generator(generator.flow(train_imgs, train_points, batch_size=BATCH_SI
                         steps_per_epoch=(num_train_examples // BATCH_SIZE))
 
 
-
 ###                 EVALUATE THE MODEL               ###
 
 # evaluate the accuracy of the trained model using the test dataset
 metrics = model.evaluate(test_imgs, test_points)
 print("Final loss:{}\nFinal accuracy:{}".format(metrics[0], metrics[1]))
-
 
 
 ###                 SAVING THE MODEL                 ###
@@ -424,4 +418,3 @@ with open(shape_path, "w") as json_file:
 # serialize weights to HDF5
 model.save_weights(weight_path)
 print("Saved model to disk")
-
