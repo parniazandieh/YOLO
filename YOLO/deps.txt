@@ -6,5 +6,5 @@ pandas
 pydicom
 keras
 scikit-image
-PIL
+Pillow
 
