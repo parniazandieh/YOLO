@@ -21,7 +21,7 @@ import tqdm.auto
 tqdm.tqdm = tqdm.auto.tqdm
 
 # tf.enable_eager_execution() #comment this out if causing errors
-tf.logging.set_verbosity(tf.logging.DEBUG)
+tf.compat.v1.logging.set_verbosity(tf.logging.DEBUG)
 
 
 ###             SET MODEL CONFIGURATIONS             ###
